@@ -1,0 +1,1 @@
+-record(todo, {status=backlog, who=murilo, text}).

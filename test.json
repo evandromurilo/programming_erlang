@@ -1,0 +1,10 @@
+{
+    "name": "MainServer",
+    "workers": [{
+        "name": "worker_special_queue",
+        "amount": 2
+    }, {
+        "name": "worker_default_queue",
+        "amount": 6
+    }]
+}

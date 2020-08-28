@@ -1,5 +1,5 @@
 -module(lib_misc).
--export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0]).
+-export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2]).
 -import(erlang, [system_time/1]).
 
 for(Max, Max, F) -> [F(Max)];
@@ -70,3 +70,24 @@ time_string({Hour, Minute, Second}) ->
    
 str(N) when N >= 10 -> integer_to_list(N);
 str(N) when N < 10 -> "0" ++ integer_to_list(N).
+
+% it's a proposed exercise, but the json BIFS were not
+% actually implemented in the erlang language
+%
+% read_json_config(Filename) ->
+%     Content = file:read_file(Filename),
+%     maps:from_json(Content).
+% 
+% test_read_json_config() ->
+%     M = read_json_config("./test.json"),
+%     #{name := "MainServer"} = M.
+
+map_search_pred(Map, Pred) ->
+    first(maps:to_list(Map), Pred).
+
+first([H|T], Pred) ->
+    case Pred(H) of
+        true -> H;
+        false -> first(T, Pred)
+    end;
+first([], Pred) -> not_found.
