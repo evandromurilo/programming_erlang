@@ -11,7 +11,9 @@ cost(shirt) ->
 cost(socks) ->
     2;
 cost(computer) ->
-    30.
+    30;
+cost(X) ->
+    throw({itemWithoutCost, X}).
 
 total(ShoppingList) ->
     sum([cost(What) * N || {What, N} <- ShoppingList]).
