@@ -12,7 +12,7 @@ filter(F, L) ->
           F(X)].
 
 split(L) ->
-    {filter(fun(N) -> even(N) end, L), filter(fun(N) -> odd(N) end, L)}.
+    {filter(fun even/1, L), filter(fun odd/1, L)}.
 
 a_split(L) -> a_split_acc(L, [], []).
 
