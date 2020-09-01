@@ -1,5 +1,5 @@
 -module(lib_misc).
--export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2]).
+-export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2, size_of/1, join/2, count/1, unique/1, map_joining/2]).
 -import(erlang, [system_time/1]).
 
 for(Max, Max, F) -> [F(Max)];
@@ -91,3 +91,33 @@ first([H|T], Pred) ->
         false -> first(T, Pred)
     end;
 first([], Pred) -> not_found.
+
+size_of(L) ->
+    size_of(L, 0).
+
+size_of([], N) ->
+    N;
+size_of([H|T], N) ->
+    size_of(T, N+1).
+
+join([], L2) ->
+    L2;
+join([H|T], L2) ->
+    join(T, [H|L2]).
+
+count(L) ->
+    count(L, #{}).
+
+count([], X) ->
+    X;
+count([H|T], X) ->
+    count(T, maps:update_with(H, fun(N) -> N+1 end, 1, X)).
+
+unique(L) ->
+    [K || {K, V} <- maps:to_list(count(L)),
+                    V =:= 1].
+
+map_joining([H|T], F) ->
+    join(F(H), map_joining(T, F));
+map_joining([], F) ->
+    [].
