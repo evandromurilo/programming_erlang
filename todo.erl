@@ -2,6 +2,8 @@
 -export([advance/1, count_characters/1]).
 -include("todo.hrl").
 
+-spec advance(tuple()) -> tuple().
+
 advance(#todo{status=backlog} = R) ->
     R#todo{status=prework};
 advance(#todo{status=prework} = R) ->
