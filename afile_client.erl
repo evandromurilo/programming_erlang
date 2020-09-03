@@ -1,5 +1,4 @@
 -module(afile_client).
--module(afile_client).
 -export([ls/1, get_file/2, put_file/3]).
 
 ls(Server) ->

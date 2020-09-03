@@ -1,6 +1,20 @@
 -module(mod_info).
 -export([most_functions/0, total_functions/1, list_functions/1, list_functions/0, unambiguous_functions/0, most_common_function_name/0, ambiguous_functions/0]).
 
+-spec most_functions() -> {Module, Total} when
+      Module :: atom,
+      Total :: non_neg_integer().
+
+-spec list_functions() -> [function_signature()].
+
+-spec unambiguous_functions() -> [function_signature()].
+
+-spec most_common_function_name() -> function_signature().
+
+-spec ambiguous_functions() -> [function_signature()].
+
+-type function_signature() :: {Name::atom, Arity::non_neg_integer()}.
+ 
 most_functions() ->
     most_functions(code:all_loaded(), {}, 0).
 

@@ -2,6 +2,39 @@
 -export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2, size_of/1, join/2, count/1, unique/1, map_joining/2]).
 -import(erlang, [system_time/1]).
 
+-spec for(Begin, Max, fun((integer()) -> Y)) -> [Y] when
+      Begin :: integer(),
+      Max :: integer().
+
+-spec qsort([X]) -> [X].
+
+-spec max(integer(), integer()) -> integer().
+
+-spec filter(fun((X) -> boolean()), [X]) -> [X].
+
+-spec odds_and_evens([integer()]) -> {Odds, Evens} when
+      Odds :: [integer()],
+      Evens :: [integer()].
+
+-spec tuple_to_list(tuple()) -> list().
+
+-spec time_func(fun()) -> MicrosecondsElapsed when
+      MicrosecondsElapsed :: integer().
+
+-spec datetime_string() -> string().
+
+-spec map_search_pred(#{any() => V}, fun((V) -> boolean())) -> not_found | V.
+
+-spec size_of(list()) -> integer().
+
+-spec join(list(), list()) -> list().
+
+-spec count(list()) -> map().
+
+-spec unique(list()) -> list().
+
+-spec map_joining(list(), fun((any()) -> Y)) -> [Y].
+
 for(Max, Max, F) -> [F(Max)];
 for(I, Max, F) -> [F(I)|for(I+1, Max, F)].
 
@@ -12,7 +45,7 @@ qsort([Pivot|T]) ->
     qsort([X || X <- T, X > Pivot]).
                     
 
-perms([]) -> [];
+perms([]) -> [[]];
 perms(L) -> [[H|T] || H <- L,
                       T <- perms(L--[H])].
 
