@@ -50,20 +50,20 @@ perms(L) -> [[H|T] || H <- L,
                       T <- perms(L--[H])].
 
 max(X, Y) when X > Y -> X;
-max(X, Y) -> Y.
+max(_X, Y) -> Y.
 
-filter(P, []) -> [];
+filter(_P, []) -> [];
 filter(P, [H|T]) -> filter1(P(H), H) ++ filter(P, T).
 
 filter1(true, H) -> [H];
-filter1(false, H) -> [].
+filter1(false, _H) -> [].
 
 a_filter(P, [H|T]) ->
     case P(H) of
         true -> [H|a_filter(P, T)];
         false -> a_filter(P, T)
     end;
-a_filter(P, []) ->
+a_filter(_P, []) ->
     [].
 
 odds_and_evens(L) ->
@@ -123,14 +123,14 @@ first([H|T], Pred) ->
         true -> H;
         false -> first(T, Pred)
     end;
-first([], Pred) -> not_found.
+first([], _Pred) -> not_found.
 
 size_of(L) ->
     size_of(L, 0).
 
 size_of([], N) ->
     N;
-size_of([H|T], N) ->
+size_of([_H|T], N) ->
     size_of(T, N+1).
 
 join([], L2) ->
@@ -152,5 +152,5 @@ unique(L) ->
 
 map_joining([H|T], F) ->
     join(F(H), map_joining(T, F));
-map_joining([], F) ->
+map_joining([], _F) ->
     [].
