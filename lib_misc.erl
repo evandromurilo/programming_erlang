@@ -1,5 +1,5 @@
 -module(lib_misc).
--export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2, size_of/1, join/2, count/1, unique/1, map_joining/2]).
+-export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2, size_of/1, join/2, count/1, unique/1, map_joining/2, on_exit/2, start/1, keep_alive/2]).
 -import(erlang, [system_time/1]).
 
 -spec for(Begin, Max, fun((integer()) -> Y)) -> [Y] when
@@ -154,3 +154,26 @@ map_joining([H|T], F) ->
     join(F(H), map_joining(T, F));
 map_joining([], _F) ->
     [].
+
+on_exit(Pid, F) ->
+    spawn(fun() ->
+                 Ref = monitor(process, Pid),
+                 receive {'DOWN', Ref, process, Pid, Why} ->
+                         F(Why)
+                 end
+         end).
+
+start(Fs) ->
+    spawn(fun() ->
+                  [spawn_link(F) || F <- Fs],
+                  receive
+                      after
+                          infinity ->
+                               true
+                      end
+          end).
+
+keep_alive(Name, Fun) ->
+    register(Name, Pid = spawn(Fun)),
+    on_exit(Pid, fun(_Why) ->
+                         keep_alive(Name, Fun) end).
