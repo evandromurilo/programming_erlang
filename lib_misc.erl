@@ -1,5 +1,5 @@
 -module(lib_misc).
--export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2, size_of/1, join/2, count/1, unique/1, map_joining/2, on_exit/2, start/1, keep_alive/2]).
+-export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2, size_of/1, join/2, count/1, unique/1, map_joining/2, on_exit/2, start/1, keep_alive/2, necrology_spawn/3, a_necrology_spawn/3, butterfly_spawn/4, immortal_spawn/0]).
 -import(erlang, [system_time/1]).
 
 -spec for(Begin, Max, fun((integer()) -> Y)) -> [Y] when
@@ -177,3 +177,66 @@ keep_alive(Name, Fun) ->
     register(Name, Pid = spawn(Fun)),
     on_exit(Pid, fun(_Why) ->
                          keep_alive(Name, Fun) end).
+
+necrology_spawn(Mod, Func, Args) ->
+    Pid = spawn(Mod, Func, Args),
+    
+    spawn(fun() ->
+                  StartTime = system_time(microsecond),
+                  Ref = monitor(process, Pid),
+                  receive {'DOWN', Ref, process, Pid, Why} ->
+                          Elapsed = system_time(microsecond) - StartTime,
+
+                          io:format("The process ~p died after ~p microseconds with ~p~n", [Pid, Elapsed, Why])
+                  end
+    end),
+
+    Pid.
+
+a_necrology_spawn(Mod, Func, Args) ->
+    Pid = spawn(Mod, Func, Args),
+    StartTime = system_time(microsecond),
+
+    on_exit(Pid, fun(Why) ->
+                         Elapsed = system_time(microsecond) - StartTime,
+                         io:format("The process ~p died after ~p microseconds with ~p~n", [Pid, Elapsed, Why])
+                 end),
+
+    Pid.
+
+butterfly_spawn(Mod, Func, Args, Seconds) ->
+    Pid = spawn(Mod, Func, Args),
+    Milliseconds = Seconds * 1000,
+    
+    spawn(fun() ->
+                  link(Pid),
+
+                  receive
+                  after Milliseconds ->
+                          true
+                  end,
+                  io:format("Killing ~p, ~p seconds already elapsed~n", [Pid, Seconds]),
+                  exit(Pid, timeout)
+          end),
+
+    Pid.
+
+immortal_loop() ->
+    receive
+    after 5000 ->
+            io:format("I'm still running!~n")
+    end,
+    immortal_loop().
+
+immortal_spawn() ->
+    Pid = spawn(fun() -> immortal_loop() end),
+    register(immortal, Pid),
+
+    spawn(fun() ->
+                  Ref = monitor(process, Pid),
+                  receive {'DOWN', Ref, process, Pid, _Why} ->
+                          io:format("Fool! You cannot kill the immortal!!~n"),
+                          immortal_spawn()
+                  end
+          end),
+    immortal.
