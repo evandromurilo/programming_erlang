@@ -1,5 +1,5 @@
 -module(lib_misc).
--export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2, size_of/1, join/2, count/1, unique/1, map_joining/2, on_exit/2, start/1, keep_alive/2, necrology_spawn/3, a_necrology_spawn/3, butterfly_spawn/4, immortal_spawn/0]).
+-export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2, size_of/1, join/2, count/1, unique/1, map_joining/2, on_exit/2, start/1, keep_alive/2, necrology_spawn/3, a_necrology_spawn/3, butterfly_spawn/4, immortal_spawn/0, repeat/2, replace_first/3, remove_first/2]).
 -import(erlang, [system_time/1]).
 
 -spec for(Begin, Max, fun((integer()) -> Y)) -> [Y] when
@@ -34,6 +34,12 @@
 -spec unique(list()) -> list().
 
 -spec map_joining(list(), fun((any()) -> Y)) -> [Y].
+
+-spec repeat(non_neg_integer(), fun(() -> Y)) -> [Y].
+
+-spec replace_first(any(), any(), list()) -> list().
+
+-spec remove_first(any(), list()) -> list().
 
 for(Max, Max, F) -> [F(Max)];
 for(I, Max, F) -> [F(I)|for(I+1, Max, F)].
@@ -240,3 +246,23 @@ immortal_spawn() ->
                   end
           end),
     immortal.
+
+repeat(0, _Func) ->
+    [];
+repeat(Times, Func) ->
+    [Func() | repeat(Times-1, Func)].
+
+replace_first(_Old, _New, []) ->
+    [];
+replace_first(Old, New, [Old|T]) ->
+    [New|T];
+replace_first(Old, New, [H|T]) ->
+    [H|replace_first(Old, New, T)].
+
+remove_first(_Needle, []) ->
+    [];
+remove_first(Needle, [Needle|T]) ->
+    T;
+remove_first(Needle, [H|T]) ->
+    [H|remove_first(Needle, T)].
+
