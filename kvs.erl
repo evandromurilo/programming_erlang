@@ -6,32 +6,29 @@
 -spec lookup(_Key) -> {ok, _Value} | undefined.
 
 start() ->
-    Pid = spawn(fun() -> loop() end),
-    register(kvs, Pid).
-
-rpc(Command, Args) ->
-    Pid = whereis(kvs),
-
-    Pid ! {self(), Command, Args},
-
-    receive
-        {Pid, Message} ->
-            Message
-    end.
+    register(kvs, spawn(fun() -> loop() end)).
 
 store(Key, Value) ->
-    rpc(store, {Key, Value}).
+    rpc({store, Key, Value}).
 
 lookup(Key) ->
-    rpc(lookup, {Key}).
+    rpc({lookup, Key}).
+
+rpc(Q) ->
+    kvs ! {self(), Q},
+
+    receive
+        {kvs, Reply} ->
+            Reply
+    end.
 
 loop() ->
     receive
-        {From, store, {Key, Value}} ->
+        {From, {store, Key, Value}} ->
             put(Key, Value),
-            From ! {self(), true},
+            From ! {kvs, true},
             loop();
-        {From, lookup, {Key}} ->
-            From ! {self(), get(Key)},
+        {From, {lookup, Key}} ->
+            From ! {kvs, get(Key)},
             loop()
     end.
