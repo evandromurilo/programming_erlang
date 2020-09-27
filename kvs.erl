@@ -25,7 +25,7 @@ rpc(Q) ->
 loop() ->
     receive
         {From, {store, Key, Value}} ->
-            put(Key, Value),
+            put(Key, {ok, Value}),
             From ! {kvs, true},
             loop();
         {From, {lookup, Key}} ->
