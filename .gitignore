@@ -1,3 +1,5 @@
 *.beam
 *~
 book.txt
+files/*
+#*
