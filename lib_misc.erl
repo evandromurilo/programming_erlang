@@ -1,5 +1,6 @@
 -module(lib_misc).
 -export([for/3, qsort/1, perms/1, max/2, filter/2, a_filter/2, odds_and_evens/1, tuple_to_list/1, a_tuple_to_list/1, time_func/1, datetime_string/0, map_search_pred/2, size_of/1, join/2, count/1, unique/1, map_joining/2, on_exit/2, start/1, keep_alive/2, necrology_spawn/3, a_necrology_spawn/3, butterfly_spawn/4, immortal_spawn/0, repeat/2, replace_first/3, remove_first/2]).
+-export([consult/1, aconsult/1]).
 -import(erlang, [system_time/1]).
 
 -spec for(Begin, Max, fun((integer()) -> Y)) -> [Y] when
@@ -266,3 +267,28 @@ remove_first(Needle, [Needle|T]) ->
 remove_first(Needle, [H|T]) ->
     [H|remove_first(Needle, T)].
 
+consult(File) ->
+    {ok, Device} = file:open(File, read),
+    consult(Device, []).
+
+consult(Device, Terms) ->
+    case io:read(Device, '') of
+        eof -> 
+            file:close(Device),
+            Terms;
+        {ok, Term} ->
+            consult(Device, [Term | Terms])
+    end.
+
+aconsult(File) ->
+    {ok, Device} = file:open(File, read),
+    aconsult1(Device).
+
+aconsult1(Device) ->
+    case io:read(Device, '') of
+        {ok, Term} ->
+            [Term | aconsult1(Device)];
+        eof ->
+            file:close(Device),
+            []
+    end.
